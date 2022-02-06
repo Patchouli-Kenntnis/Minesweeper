@@ -1,5 +1,5 @@
 body {
-  background-color:#282c34;
+  background-color:#121212;
   color: #ffffff;
 }
 
@@ -22,7 +22,7 @@ body {
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #121212;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -45,8 +45,8 @@ body {
   }
 }
 .Block {
-  background: #999;
-  border: 1px solid #999;
+  background: #404040;
+  border: 1px solid #404040;
   float: left;
   font-size: 24px;
   font-weight: bold;
@@ -62,8 +62,24 @@ body {
 }
 
 .UnopenedBlock {
-  background: black;
-  border: 1px solid black;
+  background: #181818;
+  border: 1px solid #181818;
+  float: left;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 34px;
+  height: 34px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 34px;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+.ExplodedBlock {
+  background: red;
+  border: 1px solid red;
   float: left;
   font-size: 24px;
   font-weight: bold;

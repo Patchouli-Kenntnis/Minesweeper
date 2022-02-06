@@ -22,7 +22,7 @@ function App() {
 
 function Block(props) {
   return (
-    <button className={props.isOpened ? "Block" : "UnopenedBlock"} onClick={props.onClick}>
+    <button className={ props.isExploded ? "ExplodedBlock" : (props.isOpened ? "Block" : "UnopenedBlock") } onClick={props.onClick}>
       {props.isOpened? props.value : ' '}
     </button>
   );
@@ -57,7 +57,11 @@ class Game extends React.Component {
       for (let j = 0; j != minedGrid[i].length; ++j) {
         tilesGrid[i][j] = new Tile(
           getAdjMines(minedGrid, i, j),
-          minedGrid[i][j]
+          minedGrid[i][j],
+          false,
+          i,
+          j,
+          false
         )
       }
     }
@@ -81,17 +85,21 @@ class Game extends React.Component {
                 row.map(
                   (elem) =>
                   (<td key={nanoid()}>
-                    <Block isOpened={elem.isOpened} value={elem.getTileText()}
+                    <Block isOpened={elem.isOpened} value={elem.getTileText()} isExploded={elem.isExploded}
                     onClick=
                     {
                       () => {
                         if (!elem.isOpened) {
-                          elem.isOpened = true;
-                          this.setState({ grid: this.state.grid });
-                          console.log("click");
+                          if (elem.isMined) {
+                            this.die(elem.ln, elem.col);
+                            return;
+                          }
+                          let newGrid = deepCopyGrid(this.state.grid);
+                          discover(newGrid, elem.ln, elem.col);
+                          this.setState({grid: newGrid});
                         }
                       }
-                    }/>
+                    } />
                   </td >)
                 )
               }
@@ -108,26 +116,66 @@ class Game extends React.Component {
       </table>
     );
   }
+  die(ln, col) {
+    let newGrid = deepCopyGrid(this.state.grid);
+    newGrid[ln][col].isExploded = true;
+    for (let i = 0; i != this.state.rows; ++i)
+      for (let j = 0; j != this.state.columns; ++j) {
+        newGrid[i][j].isOpened = true;
+      }
+    this.setState({ grid: newGrid });
+    this.render();
+    alert("YOU DIE DIE!!!! Press F5 to restart the game. Press OK to see the board.");
+
+    
+  }
 }
 
 class Tile {
   number;
   isMined;
   isOpened;
-  constructor(number, isMined, onClick) {
+  ln;
+  col;
+  isExploded;
+  constructor(number, isMined, isOpened, ln, col, isExploded) {
     this.number = number;
     this.isMined = isMined;
-    this.isOpened = false;
+    this.isOpened = isOpened;
+    this.ln = ln;
+    this.col = col;
+    this.isExploded = isExploded;
   }
   getTileDebugTest() {
     return this.number + (this.isMined ? '*' : '');
   }
   getTileText() {
     //if (!this.isOpened) return ' ';  else 
-    if (this.isMined) return '💣';
+    if (this.isExploded) return '💥';
+    else if (this.isMined) return '💣';
     else if (this.number == 0) return ' ';
     else return this.number;
   }
+  explode() {
+    this.isExploded = true;
+  }
+}
+
+function deepCopyGrid(grid) {
+  var clone = Array(grid.length).fill(0).map(x => Array(x.length).fill(null));
+  for (let i = 0; i != grid.length; ++i) {
+    for (let j = 0; j != grid[i].length; ++j) {
+      clone[i][j] = new Tile(
+        grid[i][j].number,
+        grid[i][j].isMined,
+        grid[i][j].isOpened,
+        grid[i][j].ln,
+        grid[i][j].col,
+        grid[i][j].isExploded
+      )
+    }
+  }
+  return clone;
 }
 
 
@@ -174,5 +222,16 @@ function getAdjMines(array, ln, col) {
       else ++counter;
     }
   return counter;
+}
+
+function discover(array, ln, col) {
+  if (ln < 0 || ln >= array.length || col < 0 || col >= array[ln].length || array[ln][col].isOpened) return; // out of bound or already opened
+  array[ln][col].isOpened = true;
+  if (array[ln][col].number == 0) { // if the tile is not adjacent to mines, discover the adjacent 8 tiles
+    for (let i = ln - 1; i <= ln + 1; ++i)
+      for (let j = col - 1; j <= col + 1; ++j)
+        if (i != ln || j != col)
+          discover(array, i, j);
+  }
 }
 export default App;
