@@ -1,5 +1,13 @@
+body {
+  background-color:#282c34;
+  color: #ffffff;
+}
+
+
 .App {
   text-align: center;
+  align-items: center;
+
 }
 
 .App-logo {
@@ -35,4 +43,20 @@
   to {
     transform: rotate(360deg);
   }
+}
+.Block {
+  background: #999;
+  border: 1px solid #999;
+  float: left;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 34px;
+  height: 34px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 34px;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+
 }
